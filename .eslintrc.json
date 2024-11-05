@@ -1,6 +1,7 @@
 {
   "extends": "standard",
   "env": {
+    "jest": true,
     "node": true,
     "es6": true
   },

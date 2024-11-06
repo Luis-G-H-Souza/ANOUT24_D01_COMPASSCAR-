@@ -1,8 +1,12 @@
 module.exports = (app) => {
   const find = (req, res) => {
-    app.services.car.find
+    app.services.car.find()
       .then(result => res.status(200).json(result)
       )
+  }
+  const getId = (req, res) => {
+    app.services.car.findId({ id: req.params.id })
+      .then(result => res.status(200).json(result))
   }
 
   const create = async (req, res) => {
@@ -10,5 +14,5 @@ module.exports = (app) => {
     const result = await app.services.car.save(req.body)
     res.status(201).json(result)
   }
-  return { find, create }
+  return { find, getId, create }
 }

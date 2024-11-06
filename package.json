@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node/serverjs",
+    "start": "node src/server.js",
     "test": "jest",
     "lint": "eslint src/** test/** --fix",
     "secure-mode": "jest --watch --verbose=true"

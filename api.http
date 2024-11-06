@@ -1,0 +1,11 @@
+###
+POST https://localhost:3001 HTTP/1.1
+content-type: application/json
+
+{
+  "brand": "honda",
+  "model": "civic",
+  "plate": "ABC-1D23",
+  "year": "2018"
+}
+###

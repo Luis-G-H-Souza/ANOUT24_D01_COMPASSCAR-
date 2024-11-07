@@ -4,7 +4,7 @@ const board = require('../mock/createBoard')
 
 const ROUTE = '/cars'
 
-test.skip('Must insert a car successfully', () => {
+test('Must insert a car successfully', () => {
   return request(app)
     .post(ROUTE)
     .send({ brand: 'honda', model: 'civic', plate: board(), year: '2018' })

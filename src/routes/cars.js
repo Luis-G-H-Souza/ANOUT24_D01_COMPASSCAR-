@@ -10,8 +10,15 @@ module.exports = (app) => {
   }
 
   const create = async (req, res) => {
-    console.log('Dados recebidos:', req.body)
     const result = await app.services.car.save(req.body)
+    if (result.error) {
+      console.log(result.error)
+      if (result.error !== 'car already registered') {
+        return res.status(400).json(result)
+      } else {
+        return res.status(409).json(result)
+      }
+    }
     res.status(201).json(result)
   }
   return { find, getId, create }

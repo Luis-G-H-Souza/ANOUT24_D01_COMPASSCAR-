@@ -4,17 +4,20 @@ const board = require('../mock/createBoard')
 
 const MAIN_ROUTE = '/items'
 let car
-
+let carId
 beforeAll(async () => {
-  const res = await app.services.car.save({ brand: 'fiat', model: 'uno', plate: board(), year: '2015' })
-  car = { ...res }
+  const res = await app.services.car.save([{ brand: 'fiat', model: 'uno', plate: board(), year: '2015' }])
+  const car = { ...res }
+  carId = car.carInser[0].id
+  console.log('id do beforeall', carId)
 })
 
 test('Must insert items successfully', () => {
   const item = [
-    { name: 'trava eletrica', car_id: car.id }
+    { name: 'trava eletrica', car_id: carId }
   ]
-  return request(app).put(`/cars/${car.id}${MAIN_ROUTE}`)
+  console.log('id do test', carId)
+  return request(app).put(`/cars/${carId}${MAIN_ROUTE}`)
     .send(item)
     .then((result) => {
       expect(result.status).toBe(204)
@@ -22,8 +25,8 @@ test('Must insert items successfully', () => {
 })
 
 test('You must not insert an empty item', () => {
-  const item = [{ name: '', car_id: car.id }]
-  return request(app).put(`/cars/${car.id}${MAIN_ROUTE}`)
+  const item = [{ name: '', car_id: carId }]
+  return request(app).put(`/cars/${carId}${MAIN_ROUTE}`)
     .send(item)
     .then((result) => {
       expect(result.status).toBe(400)
@@ -33,16 +36,16 @@ test('You must not insert an empty item', () => {
 
 test('You must enter a maximum of 5 items', () => {
   const items = [
-    { name: 'Ar condicionado', car_id: car.id },
-    { name: 'Trava eletrica', car_id: car.id },
-    { name: 'Vidro Eletrico', car_id: car.id },
-    { name: 'Banco de couro', car_id: car.id },
-    { name: 'Central Multimidia', car_id: car.id },
-    { name: 'Pintura', car_id: car.id }
+    { name: 'Ar condicionado', car_id: carId },
+    { name: 'Trava eletrica', car_id: carId },
+    { name: 'Vidro Eletrico', car_id: carId },
+    { name: 'Banco de couro', car_id: carId },
+    { name: 'Central Multimidia', car_id: carId },
+    { name: 'Pintura', car_id: carId }
 
   ]
 
-  return request(app).put(`/cars/${car.id}${MAIN_ROUTE}`)
+  return request(app).put(`/cars/${carId}${MAIN_ROUTE}`)
     .send(items)
     .then((result) => {
       expect(result.status).toBe(400)
@@ -52,11 +55,11 @@ test('You must enter a maximum of 5 items', () => {
 
 test('Cannot insert repeated item', () => {
   const item = [
-    { name: 'trava eletrica', car_id: car.id }
+    { name: 'trava eletrica', car_id: carId }
   ]
-  return request(app).put(`/cars/${car.id}${MAIN_ROUTE}`)
+  return request(app).put(`/cars/${carId}${MAIN_ROUTE}`)
     .send(item)
-    .then(() => request(app).put(`/cars/${car.id}${MAIN_ROUTE}`)
+    .then(() => request(app).put(`/cars/${carId}${MAIN_ROUTE}`)
       .send(item))
     .then(res => {
       expect(res.status).toBe(400)
@@ -68,7 +71,7 @@ test('You cannot insert an item for a car that does not exist', () => {
   const item = [
     { name: 'trava eletrica', car_id: 'a' }
   ]
-  return request(app).put(`/cars/${car.id}${MAIN_ROUTE}`)
+  return request(app).put(`/cars/${carId}${MAIN_ROUTE}`)
     .send(item)
     .then((result) => {
       expect(result.status).toBe(404)

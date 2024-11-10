@@ -1,6 +1,6 @@
 module.exports = (app) => {
   const update = async (id, item) => {
-    console.log(item)
+    console.log('item', item)
     if (item.length > 5) {
       return { error: 'items must be a maximum of 5' }
     }
@@ -16,13 +16,12 @@ module.exports = (app) => {
     }
 
     for (const i of item) {
+      console.log('id do update', i)
       const carExist = await app.db('cars')
         .where({ id: i.car_id })
         .first()
-      console.log('Conteudo do carExist', carExist)
 
       if (carExist === undefined || carExist === null) {
-        // console.log('Conteudo do carExist', carExist)
         return { error: 'car not found' }
       }
     }
@@ -31,8 +30,8 @@ module.exports = (app) => {
       const itemExist = await app.db('cars_items')
         .where({ name: i.name, car_id: i.car_id })
         .first()
-
       if (itemExist) {
+        console.log('existe itens?:', itemExist)
         return { error: 'items cannot be repeated' }
       }
     }

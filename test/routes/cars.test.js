@@ -5,9 +5,12 @@ const board = require('../mock/createBoard')
 const ROUTE = '/cars'
 
 test('Must insert a car successfully', () => {
+  const car = [
+    { brand: 'honda', model: 'civic', plate: board(), year: '2018' }
+  ]
   return request(app)
     .post(ROUTE)
-    .send({ brand: 'honda', model: 'civic', plate: board(), year: '2018' })
+    .send(car)
     .then(res => {
       expect(res.status).toBe(201)
       expect(res.body.brand).toBe('honda')
@@ -15,8 +18,11 @@ test('Must insert a car successfully', () => {
 })
 
 test('Must return one car per id', () => {
+  const car = [
+    { brand: 'honda', model: 'civic', plate: board(), year: '2018' }
+  ]
   return app.db('cars')
-    .insert({ brand: 'honda', model: 'civic', plate: board(), year: '2018' })
+    .insert(car)
     .then(car => {
       return request(app).get(`${ROUTE}/${car[0]}`)
         .then((res) => {
@@ -27,10 +33,28 @@ test('Must return one car per id', () => {
     })
 })
 
+test('It should return an error if you search for a car with a non-existent id', () => {
+  const car = [
+    { brand: 'honda', model: 'civic', plate: board(), year: '2018' }
+  ]
+  return app.db('cars')
+    .insert(car)
+    .then(car => {
+      return request(app).get(`${ROUTE}/a`)
+        .then((res) => {
+          expect(res.status).toBe(404)
+          expect(res.body).toBe('car not found')
+        })
+    })
+})
+
 test('You must not insert a car without a brand', async () => {
+  const car = [
+    { model: 'civic', plate: board(), year: '2018' }
+  ]
   return request(app)
     .post(ROUTE)
-    .send({ model: 'civic', plate: board(), year: '2018' })
+    .send(car)
     .then(res => {
       expect(res.status).toBe(400)
       expect(res.body.error).toBe('brand is required')
@@ -38,9 +62,12 @@ test('You must not insert a car without a brand', async () => {
 })
 
 test('You must not insert a car without a model', async () => {
+  const car = [
+    { brand: 'volkswagen', plate: board(), year: '2018' }
+  ]
   return request(app)
     .post(ROUTE)
-    .send({ brand: 'volkswagen', plate: board(), year: '2018' })
+    .send(car)
     .then(res => {
       expect(res.status).toBe(400)
       expect(res.body.error).toBe('model is required')
@@ -49,9 +76,12 @@ test('You must not insert a car without a model', async () => {
 
 test('You must not insert a car without a year', async () => {
   const plate = await board()
+  const car = [
+    { brand: 'volkswagen', model: 'jetta', plate, year: '2008' }
+  ]
   return request(app)
     .post(ROUTE)
-    .send({ brand: 'volkswagen', model: 'jetta', plate, year: '2008' })
+    .send(car)
     .then(res => {
       expect(res.status).toBe(400)
       expect(res.body.error).toBe('year must be between 2015 and 2025')
@@ -60,9 +90,12 @@ test('You must not insert a car without a year', async () => {
 
 test('You should not include a car that is not at most 10 years old considering the following year', async () => {
   const plate = await board()
+  const car = [
+    { brand: 'volkswagen', model: 'jetta', plate }
+  ]
   return request(app)
     .post(ROUTE)
-    .send({ brand: 'volkswagen', model: 'jetta', plate })
+    .send(car)
     .then(res => {
       expect(res.status).toBe(400)
       expect(res.body.error).toBe('year is required')
@@ -70,9 +103,12 @@ test('You should not include a car that is not at most 10 years old considering 
 })
 
 test('You must not insert a car without a plate', async () => {
+  const car = [
+    { brand: 'lamborghini', model: 'urus', year: '2018' }
+  ]
   return request(app)
     .post(ROUTE)
-    .send({ brand: 'lamborghini', model: 'urus', year: '2018' })
+    .send(car)
     .then(res => {
       expect(res.status).toBe(400)
       expect(res.body.error).toBe('plate is required')
@@ -80,9 +116,12 @@ test('You must not insert a car without a plate', async () => {
 })
 
 test('You should not enter a car without a license plate of the correct format', async () => {
+  const car = [
+    { brand: 'lamborghini', model: 'urus', year: '2018', plate: '1BC-1D23' }
+  ]
   return request(app)
     .post(ROUTE)
-    .send({ brand: 'lamborghini', model: 'urus', year: '2018', plate: '1BC-1D23' })
+    .send(car)
     .then(res => {
       expect(res.status).toBe(400)
       expect(res.body.error).toBe('plate must be in the correct format ABC-1C34')
@@ -90,9 +129,12 @@ test('You should not enter a car without a license plate of the correct format',
 })
 
 test('You should not enter a car without a license plate of the correct size', async () => {
+  const car = [
+    { brand: 'lamborghini', model: 'urus', year: '2018', plate: 'AAA' }
+  ]
   return request(app)
     .post(ROUTE)
-    .send({ brand: 'lamborghini', model: 'urus', year: '2018', plate: 'AAA' })
+    .send(car)
     .then(res => {
       expect(res.status).toBe(400)
       expect(res.body.error).toBe('plate must be in the correct format ABC-1C34')
@@ -101,9 +143,12 @@ test('You should not enter a car without a license plate of the correct size', a
 
 test('You must not enter a car with a registered license plate', async () => {
   const plate = await board()
-  return app.db('cars').insert({ brand: 'lamborghini', model: 'urus', year: '2018', plate })
+  const car = [
+    { brand: 'lamborghini', model: 'urus', year: '2018', plate }
+  ]
+  return app.db('cars').insert(car)
     .then(() => request(app).post(ROUTE)
-      .send({ brand: 'lamborghini', model: 'urus', year: '2018', plate })
+      .send(car)
     )
     .then(res => {
       expect(res.status).toBe(409)

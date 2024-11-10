@@ -1,8 +1,37 @@
 module.exports = (app) => {
-  const find = (req, res) => {
-    app.services.car.find()
-      .then(result => res.status(200).json(result)
-      )
+  const find = async (req, res) => {
+    try {
+      const page = parseInt(req.query.page) || 1
+      let limit = parseInt(req.query.limit)
+      if (limit === 0 || limit < 1) {
+        limit = 5
+      } else if (limit > 10) {
+        limit = 10
+      }
+      const yearParams = parseInt(req.params.year)
+      const finalPlate = parseInt(req.params.final_plate)
+      const brand = req.params.brand
+
+      console.log('page:', page)
+      console.log('limit:', limit)
+
+      const offset = (page - 1) * limit
+
+      const filter = {
+        year: yearParams,
+        plate: finalPlate,
+        brand
+      }
+      const car = await app.services.car.find(filter, limit, offset)
+      const count = await app.services.car.count()
+      res.status(200).json({
+        count: count.total,
+        pages: Math.ceil(count.total / limit),
+        data: car
+      })
+    } catch (error) {
+
+    }
   }
   const getId = (req, res) => {
     app.services.car.findId([{ id: req.params.id }])

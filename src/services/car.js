@@ -1,7 +1,24 @@
 module.exports = (app) => {
   const { validation } = require('../validations/validationcar')
-  const find = (filter = {}) => {
-    return app.db('cars').where(filter).select('*')
+  const find = (filter = {}, limit, offset) => {
+    return app.db('cars')
+      .limit(limit)
+      .offset(offset)
+      .modify(queryBuilder => {
+        if (filter.year) {
+          queryBuilder.where('year', '>=', filter.year)
+        }
+        if (filter.plate) {
+          queryBuilder.where('plate', 'LIKE', `%${filter.plate}`)
+        }
+        if (filter.brand) {
+          queryBuilder.where('brand', 'LIKE', `%${filter.brand}%`)
+        }
+      })
+      .select('*')
+  }
+  const count = () => {
+    return app.db('cars').count('id as total').first()
   }
 
   const findId = async (car, filter = {}) => {
@@ -14,7 +31,14 @@ module.exports = (app) => {
       if (!carExist) {
         err.push({ error: 'car not found' })
       } else {
-        idCar.push(carExist)
+        const items = await app.db('cars_items')
+          .where({ car_id: i.id })
+          .select()
+
+        idCar.push({
+          ...carExist,
+          items
+        })
       }
     }
 
@@ -58,5 +82,5 @@ module.exports = (app) => {
     // throw error
   }
 
-  return { find, findId, save }
+  return { find, count, findId, save }
 }

@@ -1,11 +1,11 @@
 module.exports = (app) => {
-  app.route('/cars')
+  app.route('/api/v1/cars')
     .get(app.routes.cars.find)
     .post(app.routes.cars.create)
 
-  app.route('/cars/:id')
+  app.route('/api/v1/cars/:id')
     .get(app.routes.cars.getId)
 
-  app.route('/cars/:id/items')
+  app.route('/api/v1/cars/:id/items')
     .put(app.routes.items.put)
 }

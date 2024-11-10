@@ -3,7 +3,6 @@ const app = require('../../src/app')
 const board = require('../mock/createBoard')
 
 const MAIN_ROUTE = '/items'
-let car
 let carId
 beforeAll(async () => {
   const res = await app.services.car.save([{ brand: 'fiat', model: 'uno', plate: board(), year: '2015' }])
@@ -17,7 +16,7 @@ test('Must insert items successfully', () => {
     { name: 'trava eletrica', car_id: carId }
   ]
   console.log('id do test', carId)
-  return request(app).put(`/cars/${carId}${MAIN_ROUTE}`)
+  return request(app).put(`/api/v1/cars/${carId}${MAIN_ROUTE}`)
     .send(item)
     .then((result) => {
       expect(result.status).toBe(204)
@@ -26,7 +25,7 @@ test('Must insert items successfully', () => {
 
 test('You must not insert an empty item', () => {
   const item = [{ name: '', car_id: carId }]
-  return request(app).put(`/cars/${carId}${MAIN_ROUTE}`)
+  return request(app).put(`/api/v1/cars/${carId}${MAIN_ROUTE}`)
     .send(item)
     .then((result) => {
       expect(result.status).toBe(400)
@@ -45,7 +44,7 @@ test('You must enter a maximum of 5 items', () => {
 
   ]
 
-  return request(app).put(`/cars/${carId}${MAIN_ROUTE}`)
+  return request(app).put(`/api/v1/cars/${carId}${MAIN_ROUTE}`)
     .send(items)
     .then((result) => {
       expect(result.status).toBe(400)
@@ -57,9 +56,9 @@ test('Cannot insert repeated item', () => {
   const item = [
     { name: 'trava eletrica', car_id: carId }
   ]
-  return request(app).put(`/cars/${carId}${MAIN_ROUTE}`)
+  return request(app).put(`/api/v1/cars/${carId}${MAIN_ROUTE}`)
     .send(item)
-    .then(() => request(app).put(`/cars/${carId}${MAIN_ROUTE}`)
+    .then(() => request(app).put(`/api/v1/cars/${carId}${MAIN_ROUTE}`)
       .send(item))
     .then(res => {
       expect(res.status).toBe(400)
@@ -71,7 +70,7 @@ test('You cannot insert an item for a car that does not exist', () => {
   const item = [
     { name: 'trava eletrica', car_id: 'a' }
   ]
-  return request(app).put(`/cars/${carId}${MAIN_ROUTE}`)
+  return request(app).put(`/api/v1/cars/${carId}${MAIN_ROUTE}`)
     .send(item)
     .then((result) => {
       expect(result.status).toBe(404)

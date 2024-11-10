@@ -2,7 +2,7 @@ const request = require('supertest')
 const app = require('../../src/app')
 const board = require('../mock/createBoard')
 
-const ROUTE = '/cars'
+const ROUTE = '/api/v1/cars'
 
 test('Must insert a car successfully', () => {
   const car = [

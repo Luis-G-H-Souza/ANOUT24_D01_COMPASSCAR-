@@ -51,7 +51,8 @@ module.exports = (app) => {
     try {
       const Errors = []
       const carInser = []
-      for (const i of car) {
+      const carsToProcess = Array.isArray(car) ? car : [car]
+      for (const i of carsToProcess) {
         const erro = validation(i)
         if (erro.length > 0) {
           const valErro = { error: erro.join(', ') }
@@ -67,7 +68,7 @@ module.exports = (app) => {
       if (Errors.length > 0) {
         return { Errors, carInser: [] }
       }
-      for (const i of car) {
+      for (const i of carsToProcess) {
         try {
           const result = await app.db('cars').insert(i)
           const newCarId = result[0]
@@ -75,12 +76,39 @@ module.exports = (app) => {
           carInser.push(newCar)
         } catch {}
       }
-      return { Errors, carInser }
+      if (Errors.length === 0) {
+        return { carInser }
+      } else {
+        return { Errors, carInser }
+      }
     } catch (error) {
 
     }
     // throw error
   }
 
-  return { find, count, findId, save }
+  const update = async (id, car) => {
+    console.log(id.id)
+
+    const result = await app.db('cars')
+      .where({ id: id.id })
+    console.log(result)
+    if (result.length === 0) {
+      return { error: 'car not found' }
+    }
+    const board = await app.db('cars')
+      .where({ plate: car.plate })
+          console.log(board)
+    if (board.length > 0) {
+      return { error: 'car already registered' }
+    }
+    if (result.length > 0 && board.length === 0) {
+      await app.db('cars')
+        .where({ id: id.id })
+        .update(car)
+      return {}
+    }
+  }
+
+  return { find, count, findId, save, update }
 }

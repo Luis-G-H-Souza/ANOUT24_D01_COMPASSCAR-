@@ -55,32 +55,39 @@ module.exports = (app) => {
 
   const create = async (req, res) => {
     const result = await app.services.car.save(req.body)
-    if (Array.isArray(result.Errors)) {
+
+    if (result.Errors && result.Errors.length > 0) {
       for (const i of result.Errors) {
         if (i.error) {
           if (i.error !== 'car already registered') {
-            return res.status(400).json(i)
+            return res.status(400).json(i.error)
           } else {
-            return res.status(409).json(i)
+            return res.status(409).json(i.error)
           }
         }
-        res.status(201).json(i)
-      }
-    } else {
-      if (result.Errors !== 'car already registered') {
-        return res.status(400).json(result)
-      } else {
-        return res.status(409).json(result)
       }
     }
-    if (Array.isArray(result.carInser)) {
-      for (const i of result.carInser) {
-        res.status(201).json(i)
-      }
-    } else {
+
+    if (result.carInser && result.carInser.length > 0) {
       res.status(201).json(result.carInser)
+    } else {
+      res.status(400).json()
     }
   }
 
-  return { find, getId, create }
+  const patch = async (req, res) => {
+    const result = await app.services.car.update(req.params, req.body)
+    console.log(result)
+    if (result.error) {
+      if (result.error === 'car not found') {
+        res.status(404).json('car not found')
+      } else if (result.error === 'car already registered') {
+        res.status(409).json('car already registered')
+      }
+    } else {
+      res.status(204).end()
+    }
+  }
+
+  return { find, getId, create, patch }
 }

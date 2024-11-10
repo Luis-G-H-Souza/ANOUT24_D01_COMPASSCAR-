@@ -5,6 +5,7 @@ module.exports = (app) => {
 
   app.route('/api/v1/cars/:id')
     .get(app.routes.cars.getId)
+    .patch(app.routes.cars.patch)
 
   app.route('/api/v1/cars/:id/items')
     .put(app.routes.items.put)

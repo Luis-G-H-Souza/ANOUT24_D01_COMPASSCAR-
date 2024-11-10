@@ -3,7 +3,6 @@ module.exports = (app) => {
     app.services.item.update(req.params.id, req.body)
       .then((updateItem) => {
         if (updateItem) {
-          console.log('Conteudo do update', updateItem)
           if (updateItem.error === 'car not found') {
             return res.status(404).json(updateItem.error)
           } else if (updateItem.error) {

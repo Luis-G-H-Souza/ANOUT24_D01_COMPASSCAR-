@@ -106,29 +106,41 @@ module.exports = (app) => {
       return { error: 'car not found' }
     }
     const updateItens = {}
-    if (car.brand && car.model) { updateItens.brand = car.brand } else if (car.brand && !car.model) { return { error: 'model must also be informed' } }
+    if (car.brand) {
+      if (!car.model) {
+        return { error: 'model must also be informed' }
+      }
+      updateItens.brand = car.brand
+    }
+
     if (car.model) updateItens.model = car.model
     if (car.year) {
-      const val = await validationPlate(car.year)
+      const val = await validationYear(car.year)
+
       if (val === undefined) {
         updateItens.year = car.year
       } else {
         return { error: val }
       }
     }
+
     if (car.plate) {
-      const val = await validationYear(car.plate)
+      const val = await validationPlate(car.plate)
       if (val === undefined) {
         updateItens.plate = car.plate
       } else {
         return { error: val }
       }
     }
-    const board = await app.db('cars')
-      .where({ plate: car.plate })
-    if (board.length > 0) {
-      return { error: 'car already registered' }
+    let board = []
+    if (car.plate) {
+      board = await app.db('cars')
+        .where({ plate: car.plate })
+      if (board.length > 0) {
+        return { error: 'car already registered' }
+      }
     }
+
     if (result.length > 0 && board.length === 0) {
       await app.db('cars')
         .where({ id: id.id })

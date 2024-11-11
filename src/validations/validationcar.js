@@ -82,6 +82,7 @@ function validationPlate (plate) {
     if (!valNumber) { err.push('plate must be in the correct format ABC-1C34') }
     if (!valLetter) { err.push('plate must be in the correct format ABC-1C34') }
   }
+  return err.length > 0 ? err : undefined
 }
 
 function validationYear (year) {
@@ -92,5 +93,6 @@ function validationYear (year) {
   if (year > maxyear || year < minyear) {
     err.push(`year must be between ${minyear} and ${maxyear}`)
   }
+  return err.length > 0 ? err : undefined
 }
 module.exports = { validation, validationPlate, validationYear }

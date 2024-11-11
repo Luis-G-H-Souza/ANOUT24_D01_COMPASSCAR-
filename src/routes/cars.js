@@ -20,7 +20,6 @@ module.exports = (app) => {
       const filter = {}
       if (yearParams) filter.year = yearParams
       if (finalPlate) filter.plate = finalPlate
-      console.log('log do tipo do finalplate', typeof (finalPlate))
       if (brand) filter.brand = brand
       const car = await app.services.car.find(filter, limit, offset)
       const count = await app.services.car.count(filter)
@@ -88,13 +87,14 @@ module.exports = (app) => {
       const result = await app.services.car.update(req.params, req.body)
       if (result.error) {
         if (result.error === 'car not found') {
-          res.status(404).json('car not found')
+          res.status(404).json(result.error)
         } else if (result.error === 'car already registered') {
-          res.status(409).json('car already registered')
+          res.status(409).json(result.error)
+        } else {
+          res.status(400).json(result.error)
         }
-      } else {
-        res.status(204).end()
       }
+      res.status(204).end()
     } catch (error) {
       res.status(500).json('an internal server error occurred')
     }

@@ -170,6 +170,20 @@ test('Must upgrade a car successfully', async () => {
     })
 })
 
+test.only('It should be possible to update only some fields', async () => {
+  const res = await app.services.car.save({ brand: 'lamborghini', model: 'urus', year: '2018', plate: board() })
+
+  const carId = res.carInser[0].id
+
+  const newValuesCar =
+    { brand: 'Audi', model: 'Q7' }
+  return request(app).patch(`${ROUTE}/${carId}`)
+    .send(newValuesCar)
+    .then(res => {
+      expect(res.status).toBe(204)
+    })
+})
+
 test('You should not update a car with a non-existent ID', async () => {
   const res = await app.services.car.save({ brand: 'lamborghini', model: 'urus', year: '2018', plate: board() })
 

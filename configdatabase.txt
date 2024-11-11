@@ -1,0 +1,15 @@
+Step-by-step database creation and configuration
+
+1. Create a **compasscar.** database
+2. There must be a table called **cars.**
+    1. id: auto incrementable numeric.
+    2. brand: mandatory text.
+    3. model: required text.
+    4. plate: mandatory and unique text.
+    5. year: mandatory numeric.
+    6. created_at: Date and time by default should receive the current date and time.
+3. There must be a table called **cars_items** (Do not use ON CASCADE DELETE)**.**
+    1. id: auto incrementable numeric.
+    2. name: mandatory text.
+    3. car_id: mandatory numeric and related to the id of the cars table.
+    4. created_at: Date and time by default should receive the current date and time.

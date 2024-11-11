@@ -1,8 +1,8 @@
 module.exports = (app) => {
   const { validation, validationPlate, validationYear } = require('../validations/validationcar')
 
-  const find = (filter = {}, limit, offset) => {
-    return app.db('cars')
+  const find = async (filter = {}, limit, offset) => {
+    return await app.db('cars')
       .limit(limit)
       .offset(offset)
       .modify(queryBuilder => {
@@ -10,7 +10,7 @@ module.exports = (app) => {
           queryBuilder.where('year', '>=', filter.year)
         }
         if (filter.plate) {
-          queryBuilder.where('plate', 'LIKE', `%${filter.plate}`)
+          queryBuilder.whereRaw('RIGHT(CAST(plate AS CHAR), 1) = ?', [filter.plate.toString()])
         }
         if (filter.brand) {
           queryBuilder.where('brand', 'LIKE', `%${filter.brand}%`)
@@ -18,8 +18,19 @@ module.exports = (app) => {
       })
       .select('*')
   }
-  const count = () => {
-    return app.db('cars').count('id as total').first()
+  const count = async (filter = {}) => {
+    const query = app.db('cars')
+    if (filter.year) {
+      query.where('year', '>=', filter.year)
+    }
+    if (filter.plate) {
+      query.whereRaw('RIGHT(CAST(plate AS CHAR), 1) = ?', [filter.plate.toString()])
+    }
+    if (filter.brand) {
+      query.whereRaw('RIGHT(CAST(plate AS CHAR), 1) = ?', [filter.plate])
+    }
+    const result = await query.count('id as total').first()
+    return result
   }
 
   const findId = async (car, filter = {}) => {

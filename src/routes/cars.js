@@ -1,26 +1,29 @@
 module.exports = (app) => {
   const find = async (req, res) => {
     try {
-      const page = parseInt(req.query.page) || 1
+      let page = parseInt(req.query.page)
+      if (!page || page < 1) {
+        page = 1
+      }
       let limit = parseInt(req.query.limit)
-      if (limit === 0 || limit < 1) {
+
+      if (!limit || limit < 1) {
         limit = 5
       } else if (limit > 10) {
         limit = 10
       }
-      const yearParams = parseInt(req.params.year)
-      const finalPlate = parseInt(req.params.final_plate)
-      const brand = req.params.brand
-
+      const yearParams = parseInt(req.query.year)
+      const finalPlate = (req.query.final_plate)
+      const brand = req.query.brand
       const offset = (page - 1) * limit
-
-      const filter = {
-        year: yearParams,
-        plate: finalPlate,
-        brand
-      }
+      finalPlate.toString()
+      const filter = {}
+      if (yearParams) filter.year = yearParams
+      if (finalPlate) filter.plate = finalPlate
+      console.log('log do tipo do finalplate', typeof (finalPlate))
+      if (brand) filter.brand = brand
       const car = await app.services.car.find(filter, limit, offset)
-      const count = await app.services.car.count()
+      const count = await app.services.car.count(filter)
       res.status(200).json({
         count: count.total,
         pages: Math.ceil(count.total / limit),

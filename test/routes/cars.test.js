@@ -233,3 +233,27 @@ test('You cannot delete a car that does not exist', async () => {
       expect(res.body).toBe('car not found')
     })
 })
+
+test('Deleting car along with items', async () => {
+  const car = [
+    { brand: 'honda', model: 'civic', plate: board(), year: '2018' }
+  ]
+
+  return app.db('cars')
+    .insert(car)
+    .then(carid => {
+      const item = [
+        { name: 'trava eletrica', car_id: carid[0] }
+      ]
+      const carids = carid[0]
+      return request(app).put(`/api/v1/cars/${carids}/items`)
+        .send(item)
+        .then((res) => {
+          return request(app)
+            .delete(`${ROUTE}/${carids}`)
+            .then(res => {
+              expect(res.status).toBe(204)
+            })
+        })
+    })
+})

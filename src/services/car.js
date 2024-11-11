@@ -129,11 +129,15 @@ module.exports = (app) => {
     const carExist = await app.db('cars')
       .where({ id: id.id })
       .first()
-    if (carExist) {
-      return {}
-    } else {
+    if (!carExist) {
       return { error: 'car not found' }
     }
+    const itemExist = await app.db('cars_items').where({ car_id: id.id })
+    if (itemExist.length > 0) {
+      await app.db('cars_items').where({ car_id: id.id }).delete()
+    }
+    await app.db('cars').where({ id: id.id }).delete()
+    return {}
   }
 
   return { find, count, findId, save, update, out }

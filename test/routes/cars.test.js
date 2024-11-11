@@ -199,3 +199,16 @@ test('You should not update a car with a license plate already registered', asyn
       expect(res.status).toBe(409)
     })
 })
+
+test('Updating just a few items', async () => {
+  const res = await app.services.car.save({ brand: 'lamborghini', model: 'urus', year: '2018', plate: board() })
+  const carId = res.carInser[0].id
+
+  const newValuesCar =
+    { brand: 'Audi', model: 'Q7', plate: board() }
+  return request(app).patch(`${ROUTE}/${carId}`)
+    .send(newValuesCar)
+    .then(res => {
+      expect(res.status).toBe(204)
+    })
+})

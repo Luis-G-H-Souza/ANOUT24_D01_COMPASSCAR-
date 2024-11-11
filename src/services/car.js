@@ -1,5 +1,6 @@
 module.exports = (app) => {
-  const { validation } = require('../validations/validationcar')
+  const { validation, validationPlate, validationYear } = require('../validations/validationcar')
+
   const find = (filter = {}, limit, offset) => {
     return app.db('cars')
       .limit(limit)
@@ -88,24 +89,43 @@ module.exports = (app) => {
   }
 
   const update = async (id, car) => {
-    console.log(id.id)
-
     const result = await app.db('cars')
       .where({ id: id.id })
-    console.log(result)
     if (result.length === 0) {
       return { error: 'car not found' }
     }
+    const updateItens = {}
+    if (car.brand && car.model) { updateItens.brand = car.brand } else if (car.brand && !car.model) { return { error: 'model must also be informed' } }
+    console.log('console do update1', updateItens)
+    if (car.model) updateItens.model = car.model
+    console.log('console do update2', updateItens)
+    if (car.year) {
+      const val = await validationPlate(car.year)
+      if (val === undefined) {
+        updateItens.year = car.year
+      } else {
+        return { error: val }
+      }
+    }
+    console.log('console do update3', updateItens)
+    if (car.plate) {
+      const val = await validationYear(car.plate)
+      if (val === undefined) {
+        updateItens.plate = car.plate
+      } else {
+        return { error: val }
+      }
+    }
+    console.log('console do update4', updateItens)
     const board = await app.db('cars')
       .where({ plate: car.plate })
-          console.log(board)
     if (board.length > 0) {
       return { error: 'car already registered' }
     }
     if (result.length > 0 && board.length === 0) {
       await app.db('cars')
         .where({ id: id.id })
-        .update(car)
+        .update(updateItens)
       return {}
     }
   }

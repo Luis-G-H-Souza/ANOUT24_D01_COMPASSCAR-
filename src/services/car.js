@@ -45,11 +45,13 @@ module.exports = (app) => {
       } else {
         const items = await app.db('cars_items')
           .where({ car_id: i.id })
-          .select()
+          .select('name')
+
+        const itemNames = items.map(item => item.name)
 
         idCar.push({
           ...carExist,
-          items
+          items: itemNames
         })
       }
     }

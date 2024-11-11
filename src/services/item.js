@@ -32,7 +32,6 @@ module.exports = (app) => {
       const insertitems = item.map(i => ({ name: i, car_id: id }))
       const result = await app.db('cars_items').insert(insertitems).returning('*')
 
-      console.log('log do item', result)
       return result
     } catch (error) {
 

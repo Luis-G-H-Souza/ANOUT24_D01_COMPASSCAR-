@@ -12,7 +12,7 @@ beforeAll(async () => {
 
 test('Must insert items successfully', () => {
   const item = [
-    { name: 'trava eletrica', car_id: carId }
+    'trava eletrica'
   ]
   return request(app).put(`/api/v1/cars/${carId}${MAIN_ROUTE}`)
     .send(item)
@@ -22,7 +22,7 @@ test('Must insert items successfully', () => {
 })
 
 test('You must not insert an empty item', () => {
-  const item = [{ name: '', car_id: carId }]
+  const item = ['']
   return request(app).put(`/api/v1/cars/${carId}${MAIN_ROUTE}`)
     .send(item)
     .then((result) => {
@@ -33,12 +33,12 @@ test('You must not insert an empty item', () => {
 
 test('You must enter a maximum of 5 items', () => {
   const items = [
-    { name: 'Ar condicionado', car_id: carId },
-    { name: 'Trava eletrica', car_id: carId },
-    { name: 'Vidro Eletrico', car_id: carId },
-    { name: 'Banco de couro', car_id: carId },
-    { name: 'Central Multimidia', car_id: carId },
-    { name: 'Pintura', car_id: carId }
+    'Ar condicionado',
+    'Trava eletrica',
+    'Vidro Eletrico',
+    'Banco de couro',
+    'Central Multimidia',
+    'Pintura'
 
   ]
 
@@ -52,7 +52,7 @@ test('You must enter a maximum of 5 items', () => {
 
 test('Cannot insert repeated item', () => {
   const item = [
-    { name: 'trava eletrica', car_id: carId }
+    'trava eletrica'
   ]
   return request(app).put(`/api/v1/cars/${carId}${MAIN_ROUTE}`)
     .send(item)
@@ -66,9 +66,9 @@ test('Cannot insert repeated item', () => {
 
 test('You cannot insert an item for a car that does not exist', () => {
   const item = [
-    { name: 'trava eletrica', car_id: 'a' }
+    'trava eletrica'
   ]
-  return request(app).put(`/api/v1/cars/${carId}${MAIN_ROUTE}`)
+  return request(app).put(`/api/v1/cars/a${MAIN_ROUTE}`)
     .send(item)
     .then((result) => {
       expect(result.status).toBe(404)

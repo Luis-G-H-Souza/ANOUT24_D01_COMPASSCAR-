@@ -243,7 +243,7 @@ test('Deleting car along with items', async () => {
     .insert(car)
     .then(carid => {
       const item = [
-        { name: 'trava eletrica', car_id: carid[0] }
+        'trava eletrica'
       ]
       const carids = carid[0]
       return request(app).put(`/api/v1/cars/${carids}/items`)

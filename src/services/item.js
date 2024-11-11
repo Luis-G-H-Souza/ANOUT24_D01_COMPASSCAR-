@@ -1,43 +1,39 @@
 module.exports = (app) => {
   const update = async (id, item) => {
-    if (item.length > 5) {
-      return { error: 'items must be a maximum of 5' }
+    const carExist = await app.db('cars')
+      .where({ id })
+      .first()
+
+    if (carExist === undefined || carExist === null) {
+      return { error: 'car not found' }
     }
+
     if (!item || !Array.isArray(item) || item.length === 0) {
       return { error: 'items is required' }
     }
 
-    const invNames = item
-      .map(item => item.name && item.name.trim())
-      .filter(name => !name || name === '')
-    if (invNames.length > 0) {
+    const emptyItems = item.filter(item => !item || item.trim() === '')
+    if (emptyItems.length > 0) {
       return { error: 'items is required' }
     }
-
-    for (const i of item) {
-      const carExist = await app.db('cars')
-        .where({ id: i.car_id })
-        .first()
-
-      if (carExist === undefined || carExist === null) {
-        return { error: 'car not found' }
-      }
+    if (item.length > 5) {
+      return { error: 'items must be a maximum of 5' }
     }
 
-    for (const i of item) {
-      const itemExist = await app.db('cars_items')
-        .where({ name: i.name, car_id: i.car_id })
-        .first()
-      if (itemExist) {
-        return { error: 'items cannot be repeated' }
-      }
+    const itemExist = await app.db('cars_items')
+      .whereIn('name', item)
+      .andWhere('car_id', id)
+      .select('*')
+    if (itemExist.length > 0) {
+      return { error: 'items cannot be repeated' }
     }
+
     try {
-      const result = await app.db('cars_items').insert(item)
+      const insertitems = item.map(i => ({ name: i, car_id: id }))
+      const result = await app.db('cars_items').insert(insertitems).returning('*')
 
-      const newItem = await app.db('cars_items').where({ id: result[0] }).first()
-
-      return newItem
+      console.log('log do item', result)
+      return result
     } catch (error) {
 
     }

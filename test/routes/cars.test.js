@@ -224,7 +224,7 @@ test('Successfully deleting a car', async () => {
 })
 
 test('You cannot delete a car that does not exist', async () => {
-  const res = await app.services.car.save({ brand: 'lamborghini', model: 'urus', year: '2018', plate: board() })
+  await app.services.car.save({ brand: 'lamborghini', model: 'urus', year: '2018', plate: board() })
   const carId = '999999'
   return request(app)
     .delete(`${ROUTE}/${carId}`)

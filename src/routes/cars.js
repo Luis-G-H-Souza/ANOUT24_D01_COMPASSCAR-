@@ -16,11 +16,12 @@ module.exports = (app) => {
       const finalPlate = (req.query.final_plate)
       const brand = req.query.brand
       const offset = (page - 1) * limit
-      finalPlate.toString()
+      console.log('log do filter', yearParams)
       const filter = {}
       if (yearParams) filter.year = yearParams
-      if (finalPlate) filter.plate = finalPlate
+      if (finalPlate) filter.plate = finalPlate.toString()
       if (brand) filter.brand = brand
+      console.log('log do filter', filter)
       const car = await app.services.car.find(filter, limit, offset)
       const count = await app.services.car.count(filter)
       res.status(200).json({

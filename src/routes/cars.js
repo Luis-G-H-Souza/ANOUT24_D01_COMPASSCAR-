@@ -85,5 +85,13 @@ module.exports = (app) => {
     }
   }
 
-  return { find, getId, create, patch }
+  const out = async (req, res) => {
+    const result = await app.services.car.out(req.params)
+    if (result.error) {
+      res.status(404).json('car not found')
+    } else {
+      res.status(204).end()
+    }
+  }
+  return { find, getId, create, patch, out }
 }

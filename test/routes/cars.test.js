@@ -212,3 +212,24 @@ test('Updating just a few items', async () => {
       expect(res.status).toBe(204)
     })
 })
+
+test('Successfully deleting a car', async () => {
+  const res = await app.services.car.save({ brand: 'lamborghini', model: 'urus', year: '2018', plate: board() })
+  const carId = res.carInser[0].id
+  return request(app)
+    .delete(`${ROUTE}/${carId}`)
+    .then(res => {
+      expect(res.status).toBe(204)
+    })
+})
+
+test('You cannot delete a car that does not exist', async () => {
+  const res = await app.services.car.save({ brand: 'lamborghini', model: 'urus', year: '2018', plate: board() })
+  const carId = '999999'
+  return request(app)
+    .delete(`${ROUTE}/${carId}`)
+    .then(res => {
+      expect(res.status).toBe(404)
+      expect(res.body).toBe('car not found')
+    })
+})

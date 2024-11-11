@@ -96,9 +96,7 @@ module.exports = (app) => {
     }
     const updateItens = {}
     if (car.brand && car.model) { updateItens.brand = car.brand } else if (car.brand && !car.model) { return { error: 'model must also be informed' } }
-    console.log('console do update1', updateItens)
     if (car.model) updateItens.model = car.model
-    console.log('console do update2', updateItens)
     if (car.year) {
       const val = await validationPlate(car.year)
       if (val === undefined) {
@@ -107,7 +105,6 @@ module.exports = (app) => {
         return { error: val }
       }
     }
-    console.log('console do update3', updateItens)
     if (car.plate) {
       const val = await validationYear(car.plate)
       if (val === undefined) {
@@ -116,7 +113,6 @@ module.exports = (app) => {
         return { error: val }
       }
     }
-    console.log('console do update4', updateItens)
     const board = await app.db('cars')
       .where({ plate: car.plate })
     if (board.length > 0) {
@@ -129,6 +125,16 @@ module.exports = (app) => {
       return {}
     }
   }
+  const out = async (id) => {
+    const carExist = await app.db('cars')
+      .where({ id: id.id })
+      .first()
+    if (carExist) {
+      return {}
+    } else {
+      return { error: 'car not found' }
+    }
+  }
 
-  return { find, count, findId, save, update }
+  return { find, count, findId, save, update, out }
 }

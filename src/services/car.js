@@ -41,7 +41,7 @@ module.exports = (app) => {
         .where({ id: i.id })
         .first()
       if (!carExist) {
-        err.push({ error: 'car not found' })
+        err.push({ error: ['car not found'] })
       } else {
         const items = await app.db('cars_items')
           .where({ car_id: i.id })
@@ -62,37 +62,23 @@ module.exports = (app) => {
   const save = async (car) => {
     try {
       const Errors = []
-      const carInser = []
-      const carsToProcess = Array.isArray(car) ? car : [car]
-      for (const i of carsToProcess) {
-        const erro = validation(i)
-        if (erro.length > 0) {
-          const valErro = { error: erro.join(', ') }
-          Errors.push(valErro)
-        } else {
-          const carExists = await app.db('cars').where({ plate: i.plate }).first()
-          if (carExists) {
-            const carError = { error: 'car already registered' }
-            Errors.push(carError)
-          }
+      const erro = validation(car)
+      if (erro.length > 0) {
+        Errors.push({ error: [erro.join(', ')] })
+      } else {
+        const carExists = await app.db('cars').where({ plate: car.plate }).first()
+        if (carExists) {
+          Errors.push('car already registered')
         }
       }
       if (Errors.length > 0) {
-        return { Errors, carInser: [] }
+        return { errors: Errors }
       }
-      for (const i of carsToProcess) {
-        try {
-          const result = await app.db('cars').insert(i)
-          const newCarId = result[0]
-          const newCar = await app.db('cars').where({ id: newCarId }).first()
-          carInser.push(newCar)
-        } catch {}
-      }
-      if (Errors.length === 0) {
-        return { carInser }
-      } else {
-        return { Errors, carInser }
-      }
+
+      const result = await app.db('cars').insert(car)
+      const newCarId = result[0]
+      const newCar = await app.db('cars').where({ id: newCarId }).first()
+      return ({ newCar, errors: [] })
     } catch (error) {
 
     }
@@ -103,12 +89,12 @@ module.exports = (app) => {
     const result = await app.db('cars')
       .where({ id: id.id })
     if (result.length === 0) {
-      return { error: 'car not found' }
+      return { error: ['car not found'] }
     }
     const updateItens = {}
     if (car.brand) {
       if (!car.model) {
-        return { error: 'model must also be informed' }
+        return { error: ['model must also be informed'] }
       }
       updateItens.brand = car.brand
     }
@@ -120,7 +106,7 @@ module.exports = (app) => {
       if (val === undefined) {
         updateItens.year = car.year
       } else {
-        return { error: val }
+        return { error: [val] }
       }
     }
 
@@ -129,7 +115,7 @@ module.exports = (app) => {
       if (val === undefined) {
         updateItens.plate = car.plate
       } else {
-        return { error: val }
+        return { error: [val] }
       }
     }
     let board = []
@@ -137,7 +123,7 @@ module.exports = (app) => {
       board = await app.db('cars')
         .where({ plate: car.plate })
       if (board.length > 0) {
-        return { error: 'car already registered' }
+        return { error: ['car already registered'] }
       }
     }
 
@@ -153,7 +139,7 @@ module.exports = (app) => {
       .where({ id: id.id })
       .first()
     if (!carExist) {
-      return { error: 'car not found' }
+      return { error: ['car not found'] }
     }
     const itemExist = await app.db('cars_items').where({ car_id: id.id })
     if (itemExist.length > 0) {

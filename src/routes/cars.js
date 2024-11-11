@@ -67,7 +67,6 @@ module.exports = (app) => {
           return res.status(400).json(result.errors)
         }
       }
-      console.log('log do result', result)
       if (result.newCar && result.newCar.id) {
         res.status(201).json(result.newCar)
       } else {

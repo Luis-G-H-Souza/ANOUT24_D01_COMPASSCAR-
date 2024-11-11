@@ -8,14 +8,12 @@ beforeAll(async () => {
   const res = await app.services.car.save([{ brand: 'fiat', model: 'uno', plate: board(), year: '2015' }])
   const car = { ...res }
   carId = car.carInser[0].id
-  console.log('id do beforeall', carId)
 })
 
 test('Must insert items successfully', () => {
   const item = [
     { name: 'trava eletrica', car_id: carId }
   ]
-  console.log('id do test', carId)
   return request(app).put(`/api/v1/cars/${carId}${MAIN_ROUTE}`)
     .send(item)
     .then((result) => {

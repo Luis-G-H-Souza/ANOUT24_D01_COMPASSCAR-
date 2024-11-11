@@ -12,9 +12,6 @@ module.exports = (app) => {
       const finalPlate = parseInt(req.params.final_plate)
       const brand = req.params.brand
 
-      console.log('page:', page)
-      console.log('limit:', limit)
-
       const offset = (page - 1) * limit
 
       const filter = {
@@ -77,7 +74,6 @@ module.exports = (app) => {
 
   const patch = async (req, res) => {
     const result = await app.services.car.update(req.params, req.body)
-    console.log(result)
     if (result.error) {
       if (result.error === 'car not found') {
         res.status(404).json('car not found')

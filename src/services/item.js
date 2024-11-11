@@ -5,19 +5,19 @@ module.exports = (app) => {
       .first()
 
     if (carExist === undefined || carExist === null) {
-      return { error: 'car not found' }
+      return { error: ['car not found'] }
     }
 
     if (!item || !Array.isArray(item) || item.length === 0) {
-      return { error: 'items is required' }
+      return { error: ['items is required'] }
     }
 
     const emptyItems = item.filter(item => !item || item.trim() === '')
     if (emptyItems.length > 0) {
-      return { error: 'items is required' }
+      return { error: ['items is required'] }
     }
     if (item.length > 5) {
-      return { error: 'items must be a maximum of 5' }
+      return { error: ['items must be a maximum of 5'] }
     }
 
     const itemExist = await app.db('cars_items')
@@ -25,7 +25,7 @@ module.exports = (app) => {
       .andWhere('car_id', id)
       .select('*')
     if (itemExist.length > 0) {
-      return { error: 'items cannot be repeated' }
+      return { error: ['items cannot be repeated'] }
     }
 
     try {

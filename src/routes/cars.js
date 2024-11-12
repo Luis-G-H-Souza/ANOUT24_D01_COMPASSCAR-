@@ -60,9 +60,9 @@ module.exports = (app) => {
   const create = async (req, res) => {
     try {
       const result = await app.services.car.save(req.body)
-
+      console.log('log do result', result.errors[0])
       if (result.errors.length > 0) {
-        if (result.errors === 'car already registered') {
+        if (result.errors[0] === 'car already registered') {
           return res.status(409).json(result)
         } else if (result.errors !== 'car already registered') {
           return res.status(400).json(result.errors)
@@ -81,10 +81,11 @@ module.exports = (app) => {
   const patch = async (req, res) => {
     try {
       const result = await app.services.car.update(req.params, req.body)
+      console.log(result.error)
       if (result.error) {
-        if (result.error === 'car not found') {
+        if (result.error[0] === 'car not found') {
           res.status(404).json(result)
-        } else if (result.error === 'car already registered') {
+        } else if (result.error[0] === 'car already registered') {
           res.status(409).json(result)
         } else {
           res.status(400).json(result)

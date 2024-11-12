@@ -5,9 +5,9 @@ const board = require('../mock/createBoard')
 const MAIN_ROUTE = '/items'
 let carId
 beforeAll(async () => {
-  const res = await app.services.car.save([{ brand: 'fiat', model: 'uno', plate: board(), year: '2015' }])
+  const res = await app.services.car.save({ brand: 'fiat', model: 'uno', plate: board(), year: '2015' })
   const car = { ...res }
-  carId = car.carInser[0].id
+  carId = car.newCar.id
 })
 
 test('Must insert items successfully', () => {
@@ -27,7 +27,7 @@ test('You must not insert an empty item', () => {
     .send(item)
     .then((result) => {
       expect(result.status).toBe(400)
-      expect(result.body).toBe('items is required')
+      expect(result.body.error[0]).toBe('items is required')
     })
 })
 
@@ -46,7 +46,7 @@ test('You must enter a maximum of 5 items', () => {
     .send(items)
     .then((result) => {
       expect(result.status).toBe(400)
-      expect(result.body).toBe('items must be a maximum of 5')
+      expect(result.body.error[0]).toBe('items must be a maximum of 5')
     })
 })
 
@@ -60,7 +60,7 @@ test('Cannot insert repeated item', () => {
       .send(item))
     .then(res => {
       expect(res.status).toBe(400)
-      expect(res.body).toBe('items cannot be repeated')
+      expect(res.body.error[0]).toBe('items cannot be repeated')
     })
 })
 
@@ -72,6 +72,6 @@ test('You cannot insert an item for a car that does not exist', () => {
     .send(item)
     .then((result) => {
       expect(result.status).toBe(404)
-      expect(result.body).toBe('car not found')
+      expect(result.body.error[0]).toBe('car not found')
     })
 })

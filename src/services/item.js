@@ -3,7 +3,6 @@ module.exports = (app) => {
     const carExist = await app.db('cars')
       .where({ id })
       .first()
-
     if (carExist === undefined || carExist === null) {
       return { error: ['car not found'] }
     }
@@ -30,9 +29,8 @@ module.exports = (app) => {
 
     try {
       const insertitems = item.map(i => ({ name: i, car_id: id }))
-      const result = await app.db('cars_items').insert(insertitems).returning('*')
-
-      return result
+      await app.db('cars_items').insert(insertitems)
+      return undefined
     } catch (error) {
 
     }

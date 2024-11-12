@@ -66,7 +66,7 @@ module.exports = (app) => {
       const Errors = []
       const erro = validation(car)
       if (erro.length > 0) {
-        Errors.push({ error: [erro.join(', ')] })
+        Errors.push(erro.join(', '))
       } else {
         const carExists = await app.db('cars').where({ plate: car.plate }).first()
         if (carExists) {
